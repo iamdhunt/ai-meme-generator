@@ -1,9 +1,8 @@
 "use client";
 
+import MemeController from "@/components/meme-controller";
 import MemeGenerator from "@/components/meme-generator";
 import MemeTemplates from "@/components/meme-templates";
-import Tones from "@/components/tones";
-import Vibes from "@/components/vibes";
 
 export default function HomePage() {
   return (
@@ -14,16 +13,12 @@ export default function HomePage() {
       </section>
 
       <section className="pt-10 pb-10">
-        <Vibes />
-      </section>
-
-      <section className="pt-5 pb-10">
-        <Tones />
+        <MemeController />
       </section>
 
       <section className="pt-10 pb-10">Caption selections go here</section>
 
-      <section className="pt-10 pb-10">
+      <section className="pt-10 pb-10 px-4">
         <MemeTemplates />
       </section>
 

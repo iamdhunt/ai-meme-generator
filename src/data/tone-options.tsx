@@ -58,13 +58,6 @@ export const toneOptions: ToneOptions[] = [
     tooltip: "Understated humor relying on subtlety and wit.",
   },
   {
-    id: "deadpan",
-    label: "Deadpan",
-    description:
-      "A tone that is deliberately impassive or expressionless, often used to create a humorous contrast with absurd or ridiculous situations.",
-    tooltip: "Impassive tone creating humorous contrast.",
-  },
-  {
     id: "melancholic",
     label: "Melancholic",
     description:
