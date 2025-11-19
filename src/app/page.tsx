@@ -1,7 +1,5 @@
 "use client";
 
-import MemeGenerator from "@/components/MemeGenerator";
-
 export default function HomePage() {
   return (
     <main className="text-center mt-10">
@@ -20,9 +18,7 @@ export default function HomePage() {
 
       <section>Image templates go here</section>
 
-      <section>
-        <MemeGenerator />
-      </section>
+      <section></section>
     </main>
   );
 }
