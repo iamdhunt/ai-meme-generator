@@ -1,4 +1,6 @@
-export const memeTemplates = [
+import { MemeTemplate } from "../types/types";
+
+export const memeTemplates: MemeTemplate[] = [
   {
     id: "blinking-white-guy",
     name: "Blinking White Guy",
