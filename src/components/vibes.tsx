@@ -13,7 +13,7 @@ export default function Vibes({
 }: VibeSelectorProps) {
   return (
     <>
-      <h1 className="text-center">1. Choose a Vibe</h1>
+      <h1 className="text-center">2. Choose a Vibe</h1>
       <div className="flex flex-wrap justify-center">
         {vibes.map((vibe) => {
           const isSelected = vibe.id === selectedVibe;

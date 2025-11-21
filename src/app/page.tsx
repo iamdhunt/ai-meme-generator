@@ -12,14 +12,12 @@ export default function HomePage() {
         <p className="">Culture-coded chaos.</p>
       </section>
 
-      <section className="pt-10 pb-10">
-        <MemeController />
-      </section>
-
-      <section className="pt-10 pb-10">Caption selections go here</section>
-
       <section className="pt-10 pb-10 px-4">
         <MemeTemplates />
+      </section>
+
+      <section className="pt-10 pb-10">
+        <MemeController />
       </section>
 
       <section className="pt-10 pb-10">

@@ -14,7 +14,7 @@ export default function Tones({
 }: ToneSelectorProps) {
   return (
     <>
-      <h1 className="text-center">2. Select a Tone</h1>
+      <h1 className="text-center">3. Select a Tone</h1>
       <div className="flex flex-wrap justify-center">
         {toneOptions.map((tone) => {
           const isSelected = tone.id === selectedTone;

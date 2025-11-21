@@ -3,7 +3,7 @@ import { memeTemplates } from "@/data/meme-template-imgs";
 export default function MemeTemplates() {
   return (
     <>
-      <h1 className="text-center">3. Pick a Meme</h1>
+      <h1 className="text-center">1. Pick a Meme</h1>
       <div className="flex flex-wrap justify-center gap-2">
         {memeTemplates.map((template) => (
           <div
