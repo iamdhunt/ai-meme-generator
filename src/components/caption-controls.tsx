@@ -1,5 +1,8 @@
 "use client";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+
 type CaptionControlsProps = {
   selectedVibeLabel?: string;
   selectedToneLabel?: string;
@@ -12,6 +15,8 @@ type CaptionControlsProps = {
   selectedCaptionIndex: number | null;
   onGenerate: () => void;
   onSelectCaption: (index: number) => void;
+  onClearVibe?: () => void;
+  onClearTone?: () => void;
 };
 
 export default function CaptionControls({
@@ -26,6 +31,8 @@ export default function CaptionControls({
   selectedCaptionIndex,
   onGenerate,
   onSelectCaption,
+  onClearVibe,
+  onClearTone,
 }: CaptionControlsProps) {
   return (
     <>
@@ -34,13 +41,27 @@ export default function CaptionControls({
         {(hasSelectedVibe || hasSelectedTone) && (
           <>
             {hasSelectedVibe && selectedVibeLabel && (
-              <div className="label">{selectedVibeLabel}</div>
+              <button
+                type="button"
+                className="label inline-flex items-center gap-2 hover:cursor-pointer"
+                onClick={onClearVibe}
+                aria-label={`Clear selected vibe ${selectedVibeLabel}`}
+              >
+                <FontAwesomeIcon icon={faCircleXmark} /> {selectedVibeLabel}
+              </button>
             )}
             {hasSelectedTone && hasSelectedVibe && (
               <div className="text-white">+</div>
             )}
             {hasSelectedTone && selectedToneLabel && (
-              <div className="label">{selectedToneLabel}</div>
+              <button
+                type="button"
+                className="label inline-flex items-center gap-2 hover:cursor-pointer"
+                onClick={onClearTone}
+                aria-label={`Clear selected tone ${selectedToneLabel}`}
+              >
+                <FontAwesomeIcon icon={faCircleXmark} /> {selectedToneLabel}
+              </button>
             )}
           </>
         )}

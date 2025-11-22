@@ -120,4 +120,18 @@ export const toneOptions: ToneOptions[] = [
       "A tone that embraces disorder, unpredictability, and spontaneity, often resulting in humorous or unexpected situations.",
     tooltip: "Embraces disorder and unpredictability.",
   },
+  {
+    id: "flabbergasted",
+    label: "Flabbergasted",
+    description:
+      "A tone that expresses extreme surprise or astonishment, often in an exaggerated or comedic way.",
+    tooltip: "Extremely surprised or astonished.",
+  },
+  {
+    id: "pompous",
+    label: "Pompous",
+    description:
+      "A tone that is characterized by an inflated sense of self-importance or superiority, often conveyed in a humorous or exaggerated manner.",
+    tooltip: "Inflated sense of self-importance.",
+  },
 ];

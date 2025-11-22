@@ -57,6 +57,7 @@ export async function generateCaptions({
     - Each caption should be 5-12 words max
     - No hashtags
     - No emojis
+    - No special characters
     - No quoting or explaining the image
     - No periods or punctuation at the end of the text
     - No numbering. Just 3 captions separated by line breaks.

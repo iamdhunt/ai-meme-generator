@@ -150,6 +150,8 @@ export default function MemeController() {
             selectedCaptionIndex={selectedCaptionIndex}
             onGenerate={handleGenerate}
             onSelectCaption={setSelectedCaptionIndex}
+            onClearVibe={() => setSelectedVibe(null)}
+            onClearTone={() => setSelectedTone(null)}
           />
         </section>
       )}

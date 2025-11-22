@@ -1,7 +1,11 @@
-import { toneOptions } from "@/data/tone-options";
+"use client";
+
+import { useState } from "react";
+
 import { ToneOptions } from "@/types/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import Shuffler from "@/utils/shuffler";
 
 type ToneSelectorProps = {
   tones: ToneOptions[];
@@ -14,10 +18,12 @@ export default function Tones({
   selectedTone,
   onSelectTone,
 }: ToneSelectorProps) {
+  const [shuffledTones] = useState(() => Shuffler(tones));
+
   return (
     <>
       <div className="flex flex-wrap justify-center mt-4">
-        {toneOptions.map((tone) => {
+        {shuffledTones.map((tone) => {
           const isSelected = tone.id === selectedTone;
           return (
             <button

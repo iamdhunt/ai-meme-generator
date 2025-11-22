@@ -1,10 +1,12 @@
 import { memeTemplates } from "@/data/meme-template-imgs";
-import Image from "next/image";
+import Shuffler from "@/utils/shuffler";
 
 type MemeTemplatesProps = {
   selectedTemplateId: string | null;
   onSelectTemplate: (templateId: string) => void;
 };
+
+const shuffledTemplates = Shuffler(memeTemplates);
 
 export default function MemeTemplates({
   selectedTemplateId,
@@ -13,7 +15,7 @@ export default function MemeTemplates({
   return (
     <>
       <div className="mt-4 flex flex-wrap justify-center gap-2">
-        {memeTemplates.map((template) => {
+        {shuffledTemplates.map((template) => {
           const isSelected = selectedTemplateId === template.id;
 
           return (

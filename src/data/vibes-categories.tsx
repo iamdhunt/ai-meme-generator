@@ -45,10 +45,10 @@ export const vibesCategories: VibeCategories[] = [
   },
   {
     id: "indie-culture",
-    label: "Indie Over Algorithms",
+    label: "Indie>>>",
     description:
       "A vibe that celebrates independent culture and creativity, often in opposition to mainstream trends and algorithms.",
-    tooltip: "Indie>>>",
+    tooltip: "Indie over algorithms",
   },
   {
     id: "internet-brain-rot",
@@ -67,7 +67,8 @@ export const vibesCategories: VibeCategories[] = [
   {
     id: "film-school-dropout",
     label: "Film School Dropout",
-    description: 'A vibe that reflects the "deep" thoughts of a film snob.',
+    description:
+      'A vibe that reflects the "deep" thoughts of a film snob, making one believe they have better taste than others.',
     tooltip: 'The "deep" thoughts of a film snob.',
   },
   {
@@ -99,11 +100,11 @@ export const vibesCategories: VibeCategories[] = [
     tooltip: "Celebrating unconventional artistic expression.",
   },
   {
-    id: "lowkey-philosopher",
-    label: "Lowkey Philosopher",
+    id: "high-key-philosopher",
+    label: "High Key Philosopher",
     description:
-      "A vibe that reflects a thoughtful and introspective approach to life, often questioning societal norms and exploring deeper meanings.",
-    tooltip: "Thoughtful questioning of societal norms.",
+      "A vibe that channels the overconfident, cosmic-revelation energy of a stoner who believes they've unlocked the secrets of existence.",
+    tooltip: "Stoner enlightenment.",
   },
   {
     id: "high-concept-stupid",
@@ -174,5 +175,12 @@ export const vibesCategories: VibeCategories[] = [
     description:
       "A vibe that focuses on the overall mood and atmosphere, prioritizing feelings and sensations over specific themes or messages.",
     tooltip: "Focusing on mood and atmosphere.",
+  },
+  {
+    id: "music-snob",
+    label: "Music Snob",
+    description:
+      "A vibe that reflects a discerning approach to music that makes one believe they have better taste than others, often emphasizing niche genres and underground artists.",
+    tooltip: "A discerning taste in music.",
   },
 ];

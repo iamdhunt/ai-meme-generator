@@ -1,6 +1,11 @@
+"use client";
+
+import { useState } from "react";
+
 import type { VibeCategories } from "@/types/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import Shuffler from "@/utils/shuffler";
 
 type VibeSelectorProps = {
   vibes: VibeCategories[];
@@ -13,10 +18,12 @@ export default function Vibes({
   selectedVibe,
   onSelectVibe,
 }: VibeSelectorProps) {
+  const [shuffledVibes] = useState(() => Shuffler(vibes));
+
   return (
     <>
       <div className="flex flex-wrap justify-center mt-4">
-        {vibes.map((vibe) => {
+        {shuffledVibes.map((vibe) => {
           const isSelected = vibe.id === selectedVibe;
 
           return (
