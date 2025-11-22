@@ -12,7 +12,6 @@ export default function MemeTemplates({
 }: MemeTemplatesProps) {
   return (
     <>
-      <h1 className="text-center font-bebas text-4xl">3. Pick a Meme</h1>
       <div className="mt-4 flex flex-wrap justify-center gap-2">
         {memeTemplates.map((template) => {
           const isSelected = selectedTemplateId === template.id;
@@ -23,16 +22,16 @@ export default function MemeTemplates({
               type="button"
               onClick={() => onSelectTemplate(template.id)}
               className={[
-                "flex-[1_1_200px] overflow-hidden rounded-xl border-2 transition-all duration-300 hover:cursor-pointer",
+                "flex-none w-[150px] aspect-* overflow-hidden rounded-xl border-2 transition-all duration-300 hover:cursor-pointer",
                 isSelected
-                  ? "border-foreground ring-2 ring-purple"
-                  : "border-transparent hover:border-neutral-500",
+                  ? "border-foreground ring-2 ring-foreground"
+                  : "border-transparent hover:border-foreground",
               ].join(" ")}
             >
               <img
                 src={template.src}
                 alt={template.alt}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover hover:scale-110 transition-all ease-in-out duration-300"
               />
             </button>
           );

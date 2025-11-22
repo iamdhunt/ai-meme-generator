@@ -15,7 +15,6 @@ export default function Vibes({
 }: VibeSelectorProps) {
   return (
     <>
-      <h1 className="text-center font-bebas text-4xl">1. Choose a Vibe</h1>
       <div className="flex flex-wrap justify-center mt-4">
         {vibes.map((vibe) => {
           const isSelected = vibe.id === selectedVibe;

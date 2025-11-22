@@ -14,16 +14,16 @@ export default function HomePage() {
           <p className="font-bebas text-2xl">Culture-coded chaos.</p>
         </section>
 
-        <section className="pt-10 pb-10 px-4">
+        <section className="pt-10 pb-10 px-8">
           <MemeController />
         </section>
 
-        <section className="pt-10 pb-10">
+        <section className="pt-10 pb-10 px-8">
           <MemeGenerator />
         </section>
       </main>
 
-      <footer className="pt-10 pb-15">
+      <footer className="pt-50 pb-15">
         <Footer />
       </footer>
     </>

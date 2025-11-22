@@ -10,6 +10,8 @@ import { toneOptions } from "@/data/tone-options";
 import Vibes from "./vibes";
 import Tones from "./tones";
 import MemeTemplates from "./meme-templates";
+import MemePreviewEditor from "./meme-preview-editor";
+import CaptionControls from "./caption-controls";
 
 export default function MemeController() {
   const [selectedTone, setSelectedTone] = useState<string | null>(null);
@@ -25,6 +27,13 @@ export default function MemeController() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
     null
   );
+
+  // step visibility flags — once unlocked they remain visible
+  const [showToneSection, setShowToneSection] = useState<boolean>(false);
+  const [showCaptionSection, setShowCaptionSection] = useState<boolean>(false);
+  const [showTemplatesSection, setShowTemplatesSection] =
+    useState<boolean>(false);
+  const [showPreviewSection, setShowPreviewSection] = useState<boolean>(false);
 
   const selectedVibeLabel = vibesCategories.find(
     (vibe) => vibe.id === selectedVibe
@@ -45,9 +54,27 @@ export default function MemeController() {
         null
       : null;
 
+  // handlers that unlock steps (they set both the selection and the "shown" flag)
+  const handleSelectVibe = (vibeId: string | null) => {
+    setSelectedVibe(vibeId);
+    if (vibeId && !showToneSection) setShowToneSection(true);
+  };
+
+  const handleSelectTone = (toneId: string | null) => {
+    setSelectedTone(toneId);
+    if (toneId && !showCaptionSection) setShowCaptionSection(true);
+  };
+
+  const handleSelectTemplate = (templateId: string | null) => {
+    setSelectedTemplateId(templateId);
+    if (templateId && !showPreviewSection) setShowPreviewSection(true);
+  };
+
   const handleGenerate = async () => {
     if (!selectedVibe || !selectedTone) return;
 
+    // clear any current caption selection and mark loading
+    setSelectedCaptionIndex(null);
     setIsLoading(true);
     setError(null);
 
@@ -66,6 +93,8 @@ export default function MemeController() {
 
       setCaptions(response.captions);
       setSelectedCaptionIndex(null);
+      // captions were successfully generated — unlock templates step
+      if (!showTemplatesSection) setShowTemplatesSection(true);
     } catch (err) {
       console.error("Unexpected error calling generateCaptions:", err);
       setCaptions(null);
@@ -80,114 +109,87 @@ export default function MemeController() {
 
   return (
     <>
+      {/* vibe selection */}
       <section className="">
+        <h1 className="text-center font-bebas text-4xl">1. Choose a Vibe</h1>
         <Vibes
           vibes={vibesCategories}
           selectedVibe={selectedVibe}
-          onSelectVibe={setSelectedVibe}
+          onSelectVibe={handleSelectVibe}
         />
       </section>
-      <section className="mt-20">
-        <Tones
-          tones={toneOptions}
-          selectedTone={selectedTone}
-          onSelectTone={setSelectedTone}
-        />
-      </section>
-      <section className="mt-10">
-        {/* selected vibe and tone display */}
-        <div className="h-10 flex items-center justify-center gap-2">
-          {(selectedVibe || selectedTone) && (
-            <>
-              {selectedVibe && <div className="label">{selectedVibeLabel}</div>}
-              {selectedTone && selectedVibe && (
-                <div className="text-white">+</div>
-              )}
-              {selectedTone && <div className="label">{selectedToneLabel}</div>}
-            </>
-          )}
-        </div>
 
-        {/* generate button */}
-        <div className="mt-6">
-          <button
-            className="uppercase px-9 py-5 font-bold border-3 rounded hover:cursor-pointer hover:bg-foreground hover:text-black hover:border-foreground disabled:bg-none disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-foreground disabled:hover:cursor-default transition-all ease-in-out duration-500"
-            disabled={isGenerateDisabled}
-            onClick={handleGenerate}
-          >
-            {isLoading ? "Generating..." : "Generate Captions"}
-          </button>
-        </div>
+      {/* tone selection */}
+      {showToneSection && (
+        <section className="mt-20 grow-in">
+          <h1 className="text-center font-bebas text-4xl">2. Select a Tone</h1>
 
-        {/* error state display */}
-        {error && <p className="mt-4 text-center">{error}</p>}
+          <Tones
+            tones={toneOptions}
+            selectedTone={selectedTone}
+            onSelectTone={handleSelectTone}
+          />
+        </section>
+      )}
 
-        {/* caption display */}
-        {captions && !error && (
-          <div className="mt-8 flex flex-col items-center space-y-3">
-            <p className="text-sm text-gray-200 mb-3 uppercase">
-              3 captions generated - choose one:
-            </p>
-
-            {captions?.map((caption, i) => {
-              const isSelected = selectedCaptionIndex === i;
-
-              return (
-                <label
-                  key={i}
-                  className={[
-                    "w-full flex items-start gap-2 max-w-2xl mx-auto cursor-pointer border-2 rounded p-3 hover:bg-gray-200 hover:text-black hover:border-gray-200 transition-all ease-in-out duration-300",
-                    isSelected ? "bg-gray-200 border-gray-200 text-black" : "",
-                  ].join(" ")}
-                >
-                  <input
-                    type="radio"
-                    name="captionChoice"
-                    className="mt-0.5 mr-2 peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-neutral-400 checked:bg-black checked:bg-clip-content checked:p-0.5 transition-all ease-in-out duration-300 [&:not(:checked):hover]:bg-slate-100"
-                    checked={isSelected}
-                    onChange={() => setSelectedCaptionIndex(i)}
-                  />
-                  <span className="text-sm uppercase font-bold">{caption}</span>
-                </label>
-              );
-            })}
-          </div>
-        )}
-      </section>
+      {/* selected vibe and tone display */}
+      {showCaptionSection && (
+        <section className="mt-20 grow-in">
+          <h1 className="text-center font-bebas text-4xl">
+            3. Select a Caption
+          </h1>
+          <CaptionControls
+            selectedVibeLabel={selectedVibeLabel}
+            selectedToneLabel={selectedToneLabel}
+            hasSelectedVibe={Boolean(selectedVibe)}
+            hasSelectedTone={Boolean(selectedTone)}
+            isGenerateDisabled={isGenerateDisabled}
+            isLoading={isLoading}
+            error={error}
+            captions={captions}
+            selectedCaptionIndex={selectedCaptionIndex}
+            onGenerate={handleGenerate}
+            onSelectCaption={setSelectedCaptionIndex}
+          />
+        </section>
+      )}
 
       {/* meme templates */}
-      <section className="mt-20">
-        <MemeTemplates
-          selectedTemplateId={selectedTemplateId}
-          onSelectTemplate={setSelectedTemplateId}
-        />
-      </section>
-      <section className="mt-20">
-        <div className="">
-          {selectedTemplate ? (
-            <div className="relative h-full w-full">
-              <img
-                src={selectedTemplate.src}
-                alt={selectedTemplate.alt}
-                className=""
-              />
+      {showTemplatesSection && (
+        <section className="mt-20 grow-in">
+          <h1 className="text-center font-bebas text-4xl">4. Pick a Meme</h1>
+          <MemeTemplates
+            selectedTemplateId={selectedTemplateId}
+            onSelectTemplate={handleSelectTemplate}
+          />
+        </section>
+      )}
 
-              {/* overlay the selected caption */}
-              {selectedCaption && (
-                <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-4 text-center font-black uppercase text-white drop-shadow-[0_0_6px_rgba(0,0,0,0.95)]">
-                  <span className="text-sm sm:text-base md:text-lg">
-                    {selectedCaption}
-                  </span>
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-neutral-300 text-center px-4">
-              Select a meme template above to see it previewed here.
-            </p>
-          )}
-        </div>
-      </section>
+      {/* meme preview */}
+      {showPreviewSection && (
+        <section className="mt-20 grow-in">
+          <h1 className="text-center font-bebas text-4xl">
+            5. Preview Your Meme
+          </h1>
+          <div className="mt-4">
+            {selectedTemplate ? (
+              <MemePreviewEditor
+                imageSrc={selectedTemplate.src}
+                alt={selectedTemplate.alt}
+                initialText={selectedCaption}
+                watermarkSrc="/logos/Brand-Logo-Wave-White-Retina.png"
+                watermarkAlt="LLF watermark"
+              />
+            ) : (
+              <div className="mx-auto flex h-80 items-center justify-center">
+                <p className="text-neutral-300 text-center px-4">
+                  Select an image to start customizing your meme.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
     </>
   );
 }
