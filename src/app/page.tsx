@@ -1,28 +1,31 @@
 "use client";
 
+import Footer from "@/components/footer";
 import MemeController from "@/components/meme-controller";
 import MemeGenerator from "@/components/meme-generator";
 import MemeTemplates from "@/components/meme-templates";
 
 export default function HomePage() {
   return (
-    <main className="text-center mt-10">
-      <section className="pt-10 pb-10">
-        <h1 className="">LLF Meme Generator</h1>
-        <p className="">Culture-coded chaos.</p>
-      </section>
+    <>
+      <main className="text-center mt-10">
+        <section className="pt-10 pb-10">
+          <h1 className="font-bokor text-6xl">Infinite Meme Machine 3000</h1>
+          <p className="font-bebas text-2xl">Culture-coded chaos.</p>
+        </section>
 
-      <section className="pt-10 pb-10 px-4">
-        <MemeTemplates />
-      </section>
+        <section className="pt-10 pb-10 px-4">
+          <MemeController />
+        </section>
 
-      <section className="pt-10 pb-10">
-        <MemeController />
-      </section>
+        <section className="pt-10 pb-10">
+          <MemeGenerator />
+        </section>
+      </main>
 
-      <section className="pt-10 pb-10">
-        <MemeGenerator />
-      </section>
-    </main>
+      <footer className="pt-10 pb-15">
+        <Footer />
+      </footer>
+    </>
   );
 }

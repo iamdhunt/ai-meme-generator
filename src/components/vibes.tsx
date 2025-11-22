@@ -1,4 +1,6 @@
 import type { VibeCategories } from "@/types/types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
 type VibeSelectorProps = {
   vibes: VibeCategories[];
@@ -13,8 +15,8 @@ export default function Vibes({
 }: VibeSelectorProps) {
   return (
     <>
-      <h1 className="text-center">2. Choose a Vibe</h1>
-      <div className="flex flex-wrap justify-center">
+      <h1 className="text-center font-bebas text-4xl">1. Choose a Vibe</h1>
+      <div className="flex flex-wrap justify-center mt-4">
         {vibes.map((vibe) => {
           const isSelected = vibe.id === selectedVibe;
 
@@ -26,11 +28,17 @@ export default function Vibes({
                 isSelected ? onSelectVibe(null) : onSelectVibe(vibe.id)
               }
               className={[
-                "m-2 p-4 border rounded hover:bg-gray-200 hover:cursor-pointer hover:text-black",
-                isSelected ? "bg-gray-200 text-black" : "",
+                "secondary-buttons",
+                isSelected ? "bg-gray-200 text-black border-gray-200" : "",
               ].join(" ")}
               title={vibe.tooltip}
             >
+              {isSelected && (
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  className="mr-1 text-black"
+                />
+              )}
               {vibe.label}
             </button>
           );

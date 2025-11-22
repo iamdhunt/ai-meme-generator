@@ -1,5 +1,7 @@
 import { toneOptions } from "@/data/tone-options";
 import { ToneOptions } from "@/types/types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
 type ToneSelectorProps = {
   tones: ToneOptions[];
@@ -14,8 +16,8 @@ export default function Tones({
 }: ToneSelectorProps) {
   return (
     <>
-      <h1 className="text-center">3. Select a Tone</h1>
-      <div className="flex flex-wrap justify-center">
+      <h1 className="text-center font-bebas text-4xl">2. Select a Tone</h1>
+      <div className="flex flex-wrap justify-center mt-4">
         {toneOptions.map((tone) => {
           const isSelected = tone.id === selectedTone;
           return (
@@ -26,11 +28,17 @@ export default function Tones({
                 isSelected ? onSelectTone(null) : onSelectTone(tone.id)
               }
               className={[
-                "m-2 p-4 border rounded hover:bg-gray-200 hover:cursor-pointer hover:text-black",
+                "secondary-buttons",
                 isSelected ? "bg-gray-200 text-black" : "",
               ].join(" ")}
               title={tone.tooltip}
             >
+              {isSelected && (
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  className="mr-1 text-black"
+                />
+              )}
               {tone.label}
             </button>
           );

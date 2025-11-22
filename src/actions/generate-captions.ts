@@ -58,6 +58,7 @@ export async function generateCaptions({
     - No hashtags
     - No emojis
     - No quoting or explaining the image
+    - No periods or punctuation at the end of the text
     - No numbering. Just 3 captions separated by line breaks.
     - Captions must be distinct from each other.
 
