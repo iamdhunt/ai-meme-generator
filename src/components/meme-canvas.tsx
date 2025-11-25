@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
-import type { TextEffect } from "./meme-preview-editor1";
-import type { CaptionPosition } from "./meme-preview-editor1";
+import { useEffect, useRef, useCallback } from "react";
+import type { TextEffect, CaptionPosition } from "./meme-preview-editor1";
+import { getContainSize, drawCaption, drawWatermark } from "@/lib/meme-render";
 
 type MemeCanvasProps = {
   imageUrl: string | null;
@@ -15,25 +14,29 @@ type MemeCanvasProps = {
   captionPosition: CaptionPosition;
   onCaptionPositionChange: (position: CaptionPosition) => void;
   fontScale: number;
-  onReadyToDownload?: (getDataUrl: () => string) => void;
 };
+
+const CAPTION_HIT_RADIUS = 300;
+const MAX_LINES_ESTIMATE = 3;
 
 export default function MemeCanvas({
   imageUrl,
   caption,
-  width = 600,
-  height = 600,
+  width = 700,
+  height = 700,
   textEffect,
   watermarkSrc,
   captionPosition,
   onCaptionPositionChange,
   fontScale,
-  onReadyToDownload,
 }: MemeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const isDraggingRef = useRef(false);
   const dragOffsetRef = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const watermarkRef = useRef<HTMLImageElement | null>(null);
   const imageMetricsRef = useRef<{
     offsetX: number;
     offsetY: number;
@@ -41,27 +44,89 @@ export default function MemeCanvas({
     drawHeight: number;
   } | null>(null);
 
+  /* ---------- core render function (no image loading here) ---------- */
+
+  const renderCanvas = useCallback(async () => {
+    const canvas = canvasRef.current;
+    const image = imageRef.current;
+    const metrics = imageMetricsRef.current;
+
+    if (!canvas || !image || !metrics) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const { offsetX, offsetY, drawWidth, drawHeight } = metrics;
+
+    // clear full logical canvas area
+    ctx.clearRect(0, 0, width, height);
+
+    // draw image in its contained area
+    ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+
+    // draw caption (with draggable box in preview)
+    if (caption && caption.trim().length > 0) {
+      await drawCaption(
+        ctx,
+        caption,
+        drawWidth,
+        drawHeight,
+        offsetX,
+        offsetY,
+        textEffect,
+        fontScale,
+        captionPosition,
+        { showBoundingBox: true }
+      );
+    }
+
+    // watermark
+    if (watermarkRef.current) {
+      drawWatermark(
+        ctx,
+        watermarkRef.current,
+        offsetX,
+        offsetY,
+        drawWidth,
+        drawHeight
+      );
+    }
+  }, [caption, captionPosition, fontScale, textEffect, width, height]);
+
+  /* ---------- mouse handlers (same behavior, but use metrics from ref) ---------- */
+
   const handleMouseDown = (
     e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
     if (!canvasRef.current || !imageMetricsRef.current) return;
 
     const canvas = canvasRef.current;
-    const { x, y } = getCanvasPointFromEvent(canvasRef.current, e);
+    const { x, y } = getCanvasPointFromEvent(canvas, e);
     const { offsetX, offsetY, drawWidth, drawHeight } = imageMetricsRef.current;
 
-    // current caption position
     const captionX = offsetX + captionPosition.xPercent * drawWidth;
     const captionY = offsetY + captionPosition.yPercent * drawHeight;
 
-    const hitRadius = 300;
+    // estimate text block height so we can center hit area
+    const baseFontSize = drawHeight * 0.08;
+    const fontSize = baseFontSize * fontScale;
+    const textBlockHeight = fontSize * MAX_LINES_ESTIMATE;
+    const centerY = captionY + textBlockHeight / 2;
 
-    const dx = x - captionX;
-    const dy = y - captionY;
+    const dxHit = x - captionX;
+    const dyHit = y - centerY;
 
-    if (dx * dx + dy * dy <= hitRadius * hitRadius) {
+    if (
+      dxHit * dxHit + dyHit * dyHit <=
+      CAPTION_HIT_RADIUS * CAPTION_HIT_RADIUS
+    ) {
       isDraggingRef.current = true;
+
+      // drag anchor still at top of text block
+      const dx = x - captionX;
+      const dy = y - captionY;
       dragOffsetRef.current = { dx, dy };
+
       canvas.style.cursor = "grabbing";
     }
   };
@@ -76,12 +141,10 @@ export default function MemeCanvas({
     const { offsetX, offsetY, drawWidth, drawHeight } = metrics;
     const { x, y } = getCanvasPointFromEvent(canvas, e);
 
-    // DRAGGING: move caption + keep "grabbing" cursor
     if (isDraggingRef.current) {
       canvas.style.cursor = "grabbing";
 
       const { dx, dy } = dragOffsetRef.current;
-
       const rawX = x - dx;
       const rawY = y - dy;
 
@@ -89,34 +152,34 @@ export default function MemeCanvas({
 
       const baseFontSize = drawHeight * 0.08;
       const fontSize = baseFontSize * fontScale;
-      const maxLines = 3;
-      const textBlockHeight = fontSize * maxLines;
+      const textBlockHeight = fontSize * MAX_LINES_ESTIMATE;
 
       const minY = offsetY;
       const maxY = offsetY + drawHeight - textBlockHeight;
-
       const clampedY = Math.min(maxY, Math.max(minY, rawY));
 
       const xPercent = (clampedX - offsetX) / drawWidth;
       const yPercent = (clampedY - offsetY) / drawHeight;
 
-      onCaptionPositionChange({
-        xPercent,
-        yPercent,
-      });
-
+      onCaptionPositionChange({ xPercent, yPercent });
       return;
     }
 
-    // NOT DRAGGING: just show hover cue (`grab` over caption)
+    // hover cue
     const captionX = offsetX + captionPosition.xPercent * drawWidth;
     const captionY = offsetY + captionPosition.yPercent * drawHeight;
 
+    const baseFontSize = drawHeight * 0.08;
+    const fontSize = baseFontSize * fontScale;
+    const textBlockHeight = fontSize * MAX_LINES_ESTIMATE;
+    const centerY = captionY + textBlockHeight / 2;
+
     const dxHover = x - captionX;
-    const dyHover = y - captionY;
-    const hitRadius = 300;
+    const dyHover = y - centerY;
+
     const isOverCaption =
-      dxHover * dxHover + dyHover * dyHover <= hitRadius * hitRadius;
+      dxHover * dxHover + dyHover * dyHover <=
+      CAPTION_HIT_RADIUS * CAPTION_HIT_RADIUS;
 
     canvas.style.cursor = isOverCaption ? "grab" : "default";
   };
@@ -128,123 +191,83 @@ export default function MemeCanvas({
     }
   };
 
+  /* ---------- effect 1: load images + set up canvas once per URL/size ---------- */
+
   useEffect(() => {
     if (!imageUrl || !canvasRef.current) return;
 
     let cancelled = false;
 
-    const render = async () => {
+    const load = async () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const context = canvas.getContext("2d");
-      if (!context) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-      // HiDPI support
       const devicePixelRatio = window.devicePixelRatio || 1;
       canvas.width = width * devicePixelRatio;
       canvas.height = height * devicePixelRatio;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
 
-      context.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
 
-      let watermarkImage: HTMLImageElement | null = null;
+      // main image
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imageUrl;
 
-      if (watermarkSrc) {
-        watermarkImage = new Image();
-        watermarkImage.src = watermarkSrc;
-        watermarkImage.crossOrigin = "anonymous";
-
-        await new Promise<void>((resolve, reject) => {
-          watermarkImage!.onload = () => resolve();
-          watermarkImage!.onerror = () => reject();
-        });
-      }
-
-      const image = new Image();
-      image.crossOrigin = "anonymous";
-      image.src = imageUrl;
-
-      // Wait for image to load
       await new Promise<void>((resolve, reject) => {
-        image.onload = () => resolve();
-        image.onerror = () => reject();
+        img.onload = () => resolve();
+        img.onerror = () => reject();
       });
 
       if (cancelled) return;
 
-      // Clear canvas
-      context.clearRect(0, 0, width, height);
+      imageRef.current = img;
 
-      // Draw image, scaled to fit (contain)
-      const metrics = getContainSize(image.width, image.height, width, height);
-      const { drawWidth, drawHeight, offsetX, offsetY } = metrics;
+      const metrics = getContainSize(img.width, img.height, width, height);
       imageMetricsRef.current = metrics;
 
-      context.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+      // watermark (optional)
+      if (watermarkSrc) {
+        const wm = new Image();
+        wm.src = watermarkSrc;
+        wm.crossOrigin = "anonymous";
 
-      // Draw caption with Bebas Neue
-      if (caption && caption.trim().length > 0) {
-        await drawCaption(
-          context,
-          caption,
-          width,
-          height,
-          drawWidth,
-          drawHeight,
-          offsetX,
-          offsetY,
-          textEffect,
-          fontScale,
-          captionPosition
-        );
+        await new Promise<void>((resolve, reject) => {
+          wm.onload = () => resolve();
+          wm.onerror = () => reject();
+        });
+
+        if (!cancelled) {
+          watermarkRef.current = wm;
+        }
+      } else {
+        watermarkRef.current = null;
       }
 
-      // Draw watermark in bottom-right
-      if (watermarkImage && watermarkImage.complete) {
-        drawWatermark(
-          context,
-          watermarkImage,
-          offsetX,
-          offsetY,
-          drawWidth,
-          drawHeight
-        );
-      }
+      // initial draw
+      await renderCanvas();
     };
 
-    render().catch((err) => {
-      console.error("Error rendering meme canvas", err);
+    load().catch((err) => {
+      console.error("Error loading images for meme canvas", err);
     });
 
-    // Cleanup flag in case component unmounts while async work is in-flight
     return () => {
       cancelled = true;
     };
-  }, [
-    imageUrl,
-    caption,
-    width,
-    height,
-    textEffect,
-    watermarkSrc,
-    captionPosition,
-    fontScale,
-  ]);
+  }, [imageUrl, width, height, watermarkSrc]);
 
-  // trigger download
+  /* ---------- effect 2: redraw when text/effect/position/size change ---------- */
+
   useEffect(() => {
-    if (!onReadyToDownload || !canvasRef.current) return;
-
-    const getDataUrl = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return "";
-      return canvas.toDataURL("image/png");
-    };
-
-    onReadyToDownload(getDataUrl);
-  }, [onReadyToDownload]);
+    // only redraw if image + metrics are ready
+    if (!imageRef.current || !imageMetricsRef.current) return;
+    renderCanvas();
+  }, [caption, captionPosition, textEffect, fontScale, renderCanvas]);
 
   return (
     <canvas
@@ -258,225 +281,7 @@ export default function MemeCanvas({
   );
 }
 
-function getContainSize(
-  srcWidth: number,
-  srcHeight: number,
-  maxWidth: number,
-  maxHeight: number
-) {
-  const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
-  const drawWidth = srcWidth * ratio;
-  const drawHeight = srcHeight * ratio;
-  const offsetX = (maxWidth - drawWidth) / 2;
-  const offsetY = (maxHeight - drawHeight) / 2;
-
-  return { drawWidth, drawHeight, offsetX, offsetY };
-}
-
-async function drawCaption(
-  context: CanvasRenderingContext2D,
-  caption: string,
-  canvasWidth: number,
-  canvasHeight: number,
-  imageWidth: number,
-  imageHeight: number,
-  imageOffsetX: number,
-  imageOffsetY: number,
-  textEffect: TextEffect,
-  fontScale: number,
-  captionPosition: CaptionPosition
-) {
-  const fontSize = Math.floor(imageHeight * 0.08 * fontScale);
-
-  try {
-    await document.fonts.load(`${fontSize}px "Bebas Neue"`);
-  } catch (e) {
-    console.warn(
-      "Failed to load Bebas Neue font before drawing canvas text.",
-      e
-    );
-  }
-
-  context.font = `${fontSize}px "Bebas Neue", system-ui, sans-serif`;
-  context.textAlign = "center";
-  context.textBaseline = "top";
-
-  context.lineWidth = Math.max(4, Math.floor(fontSize * 0.15));
-  context.strokeStyle = "black";
-  context.fillStyle = "white";
-
-  const x = imageOffsetX + captionPosition.xPercent * imageWidth;
-  const y = imageOffsetY + captionPosition.yPercent * imageHeight;
-
-  const maxWidth = imageWidth * 0.9;
-
-  wrapAndDrawText(context, caption, x, y, maxWidth, fontSize, textEffect);
-}
-
-function wrapAndDrawText(
-  context: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  maxWidth: number,
-  lineHeight: number,
-  textEffect: TextEffect
-) {
-  const words = text.split(" ");
-  const lines: string[] = [];
-  let currentLine = "";
-
-  for (const word of words) {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const { width } = context.measureText(testLine);
-    if (width > maxWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  }
-  if (currentLine) {
-    lines.push(currentLine);
-  }
-
-  if (lines.length === 0) return;
-
-  let maxLineWidth = 0;
-  for (const line of lines) {
-    const { width } = context.measureText(line);
-    if (width > maxLineWidth) {
-      maxLineWidth = width;
-    }
-  }
-
-  // stack lines upward
-  const totalHeight = lines.length * lineHeight;
-  const paddingX = lineHeight * 0.4;
-  const paddingY = lineHeight * 0.3;
-
-  const boxWidth = maxLineWidth + paddingX * 2;
-  const boxHeight = totalHeight + paddingY * 2;
-
-  const boxX = x - boxWidth / 2;
-  const boxY = y - paddingY;
-
-  // draw dashed outline for caption box
-  context.save();
-  context.setLineDash([6, 4]);
-  context.lineWidth = 1;
-  context.strokeStyle = "rgba(255, 255, 255, 1)";
-  context.strokeRect(boxX, boxY, boxWidth, boxHeight);
-  context.restore();
-
-  let currentY = y;
-
-  for (const line of lines) {
-    if (textEffect === "shadow") {
-      drawShadowLayers(context, line, x, currentY);
-    }
-
-    if (textEffect === "glow") {
-      drawGlowLayer(context, line, x, currentY);
-    }
-
-    if (textEffect === "stroke") {
-      context.strokeText(line, x, currentY);
-    }
-
-    context.fillText(line, x, currentY);
-    currentY += lineHeight;
-  }
-}
-
-function drawShadowLayers(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number
-) {
-  // save original shadow settings
-  const prevShadowColor = ctx.shadowColor;
-  const prevShadowBlur = ctx.shadowBlur;
-  const prevShadowOffsetX = ctx.shadowOffsetX;
-  const prevShadowOffsetY = ctx.shadowOffsetY;
-
-  // 1) big soft shadow (matches your stacked CSS-style “depth”)
-  ctx.shadowColor = "rgba(0, 0, 0, 0.1)";
-  ctx.shadowBlur = 23;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 18;
-  ctx.fillText(text, x, y);
-
-  // 2) medium shadow
-  ctx.shadowColor = "rgba(0, 0, 0, 0.1)";
-  ctx.shadowBlur = 13;
-  ctx.shadowOffsetY = 8;
-  ctx.fillText(text, x, y);
-
-  // 3) closer, stronger shadow
-  ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
-  ctx.shadowBlur = 3;
-  ctx.shadowOffsetY = 4;
-  ctx.fillText(text, x, y);
-
-  // restore
-  ctx.shadowColor = prevShadowColor;
-  ctx.shadowBlur = prevShadowBlur;
-  ctx.shadowOffsetX = prevShadowOffsetX;
-  ctx.shadowOffsetY = prevShadowOffsetY;
-}
-
-function drawGlowLayer(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number
-) {
-  // save original shadow settings
-  const prevShadowColor = ctx.shadowColor;
-  const prevShadowBlur = ctx.shadowBlur;
-  const prevShadowOffsetX = ctx.shadowOffsetX;
-  const prevShadowOffsetY = ctx.shadowOffsetY;
-
-  // your CSS glow:
-  // text-shadow: 0px 0px 6px rgba(255, 255, 255, 0.7);
-  ctx.shadowColor = "rgba(255, 255, 255, 0.7)";
-  ctx.shadowBlur = 6;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 0;
-
-  ctx.fillText(text, x, y);
-
-  // restore
-  ctx.shadowColor = prevShadowColor;
-  ctx.shadowBlur = prevShadowBlur;
-  ctx.shadowOffsetX = prevShadowOffsetX;
-  ctx.shadowOffsetY = prevShadowOffsetY;
-}
-
-function drawWatermark(
-  ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
-  imgOffsetX: number,
-  imgOffsetY: number,
-  imgWidth: number,
-  imgHeight: number
-) {
-  const padding = imgWidth * 0.03;
-  const targetWidth = imgWidth * 0.15;
-  const aspectRatio = img.width / img.height;
-  const targetHeight = targetWidth / aspectRatio;
-
-  const x = imgOffsetX + imgWidth - targetWidth - padding;
-  const y = imgOffsetY + imgHeight - targetHeight - padding;
-
-  ctx.globalAlpha = 0.9;
-
-  ctx.drawImage(img, x, y, targetWidth, targetHeight);
-
-  ctx.globalAlpha = 1;
-}
+/* ---------- local helper ---------- */
 
 function getCanvasPointFromEvent(
   canvas: HTMLCanvasElement,
@@ -486,37 +291,4 @@ function getCanvasPointFromEvent(
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
   return { x, y };
-}
-
-function updateCursorForPosition(
-  canvas: HTMLCanvasElement,
-  mouseX: number,
-  mouseY: number,
-  captionPosition: CaptionPosition,
-  metrics: {
-    offsetX: number;
-    offsetY: number;
-    drawWidth: number;
-    drawHeight: number;
-  },
-  isDragging: boolean
-) {
-  const { offsetX, offsetY, drawWidth, drawHeight } = metrics;
-
-  const captionX = offsetX + captionPosition.xPercent * drawWidth;
-  const captionY = offsetY + captionPosition.yPercent * drawHeight;
-
-  const dx = mouseX - captionX;
-  const dy = mouseY - captionY;
-
-  const hitRadius = 80; // nicer than 400, but you can tweak
-  const isOverCaption = dx * dx + dy * dy <= hitRadius * hitRadius;
-
-  if (isDragging && isOverCaption) {
-    canvas.style.cursor = "grabbing";
-  } else if (isOverCaption) {
-    canvas.style.cursor = "grab";
-  } else {
-    canvas.style.cursor = "default";
-  }
 }

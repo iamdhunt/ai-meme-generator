@@ -2,7 +2,9 @@
 
 import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+
 import MemeCanvas from "./meme-canvas";
+import MemeExportCanvas from "./meme-export-canvas";
 
 type MemePreviewEditor1Props = {
   imageSrc: string;
@@ -98,9 +100,21 @@ export default function MemePreviewEditor1({
             captionPosition={captionPosition}
             onCaptionPositionChange={setCaptionPosition}
             fontScale={fontScale}
-            onReadyToDownload={handleReadyToDownload}
           />
         </div>
+
+        {/* hidden export canvas */}
+        <MemeExportCanvas
+          imageUrl={imageSrc}
+          caption={initialText}
+          baseWidth={700}
+          baseHeight={700}
+          textEffect={textEffect}
+          fontScale={fontScale}
+          captionPosition={captionPosition}
+          watermarkSrc={watermarkSrc}
+          onReadyToDownload={handleReadyToDownload}
+        />
 
         <div className="flex flex-col gap-4">
           <label className="flex items-center gap-2 text-sm">
