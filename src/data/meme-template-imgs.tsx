@@ -403,4 +403,16 @@ export const memeTemplates: MemeTemplate[] = [
     src: "/memes/peasants.webp",
     alt: "Peasants meme",
   },
+  {
+    id: "simpsons-homer-backing-away",
+    name: "Simpsons Homer Backing Away",
+    src: "/memes/simpsons-homer-backing-away.webp",
+    alt: "Simpsons Homer Backing Away meme",
+  },
+  {
+    id: "vince-mcmahon-shocked",
+    name: "Vince McMahon Shocked",
+    src: "/memes/vince-mcmahon-shocked.webp",
+    alt: "Vince McMahon Shocked meme",
+  },
 ];

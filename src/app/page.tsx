@@ -17,10 +17,6 @@ export default function HomePage() {
         <section className="pt-10 pb-10 px-8">
           <MemeController />
         </section>
-
-        <section className="pt-10 pb-10 px-8">
-          <MemeGenerator />
-        </section>
       </main>
 
       <footer className="pt-50 pb-15">

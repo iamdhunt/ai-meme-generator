@@ -11,6 +11,7 @@ import Vibes from "./vibes";
 import Tones from "./tones";
 import MemeTemplates from "./meme-templates";
 import MemePreviewEditor from "./meme-preview-editor";
+import MemePreviewEditor1 from "./meme-preview-editor1";
 import CaptionControls from "./caption-controls";
 
 export default function MemeController() {
@@ -175,12 +176,11 @@ export default function MemeController() {
           </h1>
           <div className="mt-4">
             {selectedTemplate ? (
-              <MemePreviewEditor
+              <MemePreviewEditor1
                 imageSrc={selectedTemplate.src}
                 alt={selectedTemplate.alt}
                 initialText={selectedCaption}
                 watermarkSrc="/logos/Brand-Logo-Wave-White-Retina.png"
-                watermarkAlt="LLF watermark"
               />
             ) : (
               <div className="mx-auto flex h-80 items-center justify-center">
