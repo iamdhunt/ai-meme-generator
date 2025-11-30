@@ -2,6 +2,10 @@
 
 import { openaiClient } from "@/lib/openai";
 import { generateText } from "ai";
+
+import { headers } from "next/headers";
+import { enforceMemeLimits } from "@/lib/rate-limit";
+
 import { vibesCategories } from "@/data/vibes-categories";
 import { toneOptions } from "@/data/tone-options";
 import type { VibeCategories, ToneOptions } from "@/types/types";
@@ -35,6 +39,31 @@ export async function generateCaptions({
       ok: false,
       captions: null,
       error: "Please select a vibe and tone to generate captions.",
+    };
+  }
+
+  const headerStore = headers();
+  const forwardedFor = (await headerStore).get("x-forwarded-for");
+  const ip =
+    forwardedFor?.split(",")[0]?.trim() ||
+    (await headerStore).get("x-real-ip") ||
+    "unknown";
+
+  const limitResult = await enforceMemeLimits(ip);
+
+  if (!limitResult.ok) {
+    let message = "Too many requests. Please try again later.";
+
+    if (limitResult.exceeded === "short") {
+      message = "You're generating captions too fast. Try again in a moment.";
+    } else if (limitResult.exceeded === "daily") {
+      message = "You've reached your daily caption limit. Come back tomorrow!";
+    }
+
+    return {
+      ok: false,
+      captions: null,
+      error: message,
     };
   }
 
@@ -90,12 +119,12 @@ export async function generateCaptions({
       error: null,
     };
   } catch (err) {
-    console.error("Error generating caption:", err);
+    console.error("Error generating captions:", err);
 
     return {
       ok: false,
       captions: null,
-      error: "Failed to generate caption. Please try again.",
+      error: "Failed to generate captions. Please try again.",
     };
   }
 }

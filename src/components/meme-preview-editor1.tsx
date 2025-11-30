@@ -40,6 +40,8 @@ export default function MemePreviewEditor1({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
 
+  const [isShareSupported, setIsShareSupported] = useState(false);
+
   const handleReadyToDownload = (getDataUrl: () => string) => {
     downloadGetterRef.current = getDataUrl;
   };
@@ -71,8 +73,47 @@ export default function MemePreviewEditor1({
     setIsLightboxOpen(true);
   };
 
+  const handleNativeShare = async () => {
+    if (!generatedUrl) return;
+    if (typeof navigator === "undefined" || !("share" in navigator)) {
+      console.warn("Web Share API not supported in this browser.");
+      return;
+    }
+
+    try {
+      const response = await fetch(generatedUrl);
+      const blob = await response.blob();
+
+      const file = new File([blob], "my-meme.png", {
+        type: blob.type || "image/png",
+      });
+
+      const nav = navigator as any;
+      if (nav.canShare && !nav.canShare({ files: [file] })) {
+        console.warn(
+          "This browser/device cannot share files via Web Share API."
+        );
+        return;
+      }
+
+      await nav.share({
+        files: [file],
+        title: "Infinite Meme Generator 3000",
+        text: initialText ?? "I let an AI help me meme. This happened.",
+      });
+    } catch (error) {
+      console.error("Native image share failed:", error);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && "share" in navigator) {
+      setIsShareSupported(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -260,16 +301,21 @@ export default function MemePreviewEditor1({
               </div>
 
               <div className="flex items-center justify-between gap-3">
-                <span className="text-xs uppercase text-neutral-500">
-                  Share:
-                </span>
+                <button
+                  type="button"
+                  onClick={handleNativeShare}
+                  disabled={!isShareSupported || !generatedUrl}
+                  className="rounded-md bg-emerald-600 px-3 py-1.5 text-s font-semibold uppercase text-foreground hover:bg-emerald-700 hover:cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 ease-in-out"
+                >
+                  Share
+                </button>
 
                 <div className="flex gap-2">
                   <a
                     href={generatedUrl}
                     download="my-meme.png"
                     title="Download meme"
-                    className="rounded-lg bg-indigo-600 px-3 py-1.5 text-s font-semibold uppercase text-foreground hover:bg-indigo-700 hover:cursor-pointer transition-all duration-200 ease-in-out"
+                    className="rounded-md bg-indigo-600 px-3 py-1.5 text-s font-semibold uppercase text-foreground hover:bg-indigo-700 hover:cursor-pointer transition-all duration-200 ease-in-out"
                   >
                     Download
                   </a>

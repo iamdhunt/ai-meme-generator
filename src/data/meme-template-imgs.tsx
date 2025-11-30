@@ -415,4 +415,10 @@ export const memeTemplates: MemeTemplate[] = [
     src: "/memes/vince-mcmahon-shocked.webp",
     alt: "Vince McMahon Shocked meme",
   },
+  {
+    id: "simpsons-bart-chalkboard",
+    name: "Simpsons Bart Chalkboard",
+    src: "/memes/simpsons-bart-chalkboard.webp",
+    alt: "Simpsons Bart Chalkboard meme",
+  },
 ];
