@@ -1,3 +1,5 @@
+![Project Banner](public/images/meme-machine-3000.png)
+
 # Infinite Meme Machine 3000
 
 The Ultimate AI-Powered Meme Generator
@@ -64,8 +66,8 @@ Tech Stack: **Next.js 14 (App Router), TypeScript, AI SDK, Web Share API, Canvas
 
 Create `.env.local`:
 
-OPENAI_API_KEY=your_openai_api_key
-UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url
+OPENAI_API_KEY=your_openai_api_key  
+UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url  
 UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
 
 ## PWA Support
@@ -87,11 +89,11 @@ UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
 
 ## License
 
-MIT — free for personal use.
+MIT — free for personal use.  
 Give credit if you fork something substantial.
 
 ## Credits
 
-Built by Dario Hunt
-Brand: LIVING LIFE FEARLESS
+Built by Dario Hunt  
+Brand: LIVING LIFE FEARLESS  
 App: Infinite Meme Machine 3000

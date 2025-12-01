@@ -120,9 +120,7 @@ export default function MemeCanvas({
 
   /* ---------- mouse handlers (same behavior, but use metrics from ref) ---------- */
 
-  const handleMouseDown = (
-    e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-  ) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvasRef.current || !imageMetricsRef.current) return;
 
     const canvas = canvasRef.current;
@@ -146,6 +144,7 @@ export default function MemeCanvas({
       CAPTION_HIT_RADIUS * CAPTION_HIT_RADIUS
     ) {
       isDraggingRef.current = true;
+      canvas.setPointerCapture(e.pointerId);
 
       // drag anchor still at top of text block
       const dx = x - captionX;
@@ -156,9 +155,7 @@ export default function MemeCanvas({
     }
   };
 
-  const handleMouseMove = (
-    e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-  ) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvasRef.current || !imageMetricsRef.current) return;
 
     const canvas = canvasRef.current;
@@ -209,10 +206,11 @@ export default function MemeCanvas({
     canvas.style.cursor = isOverCaption ? "grab" : "default";
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     isDraggingRef.current = false;
     if (canvasRef.current) {
       canvasRef.current.style.cursor = "default";
+      canvasRef.current.releasePointerCapture(e.pointerId);
     }
   };
 
@@ -309,10 +307,11 @@ export default function MemeCanvas({
       <canvas
         ref={canvasRef}
         className="border border-neutral-700 bg-background"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        style={{ touchAction: "none" }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
       />
     </div>
   );
@@ -322,7 +321,7 @@ export default function MemeCanvas({
 
 function getCanvasPointFromEvent(
   canvas: HTMLCanvasElement,
-  e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
+  e: React.PointerEvent<HTMLCanvasElement>
 ) {
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
