@@ -9,8 +9,6 @@ Fast, fun, and dangerously easy to use.
 Live Demo: https://mememachine3000.com  
 Tech Stack: **Next.js 14 (App Router), TypeScript, AI SDK, Web Share API, Canvas Rendering**
 
----
-
 ## Features
 
 ### AI Caption Generator
@@ -50,8 +48,6 @@ Tech Stack: **Next.js 14 (App Router), TypeScript, AI SDK, Web Share API, Canvas
 - `robots.txt` & `sitemap.xml` automatically generated
 - Installable as a native-feeling web app
 
----
-
 ## Tech Stack
 
 - **Next.js 14** (App Router)
@@ -64,8 +60,6 @@ Tech Stack: **Next.js 14 (App Router), TypeScript, AI SDK, Web Share API, Canvas
 - **PWA-ready configuration**
 - **Vercel Deployment**
 
----
-
 ## Environment Variables
 
 Create `.env.local`:
@@ -74,8 +68,6 @@ OPENAI_API_KEY=your_openai_api_key
 UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url
 UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
 
----
-
 ## PWA Support
 
 - /app/manifest.json
@@ -83,8 +75,6 @@ UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
 - Dark theme: #0a0a0a
 - Installable on mobile & desktop
 - Splash screens + adaptive icons
-
----
 
 ## Future Improvements (Roadmap)
 
@@ -95,19 +85,13 @@ UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
 - Social timeline feed for created memes
 - Multi-language caption generation
 
----
-
 ## License
 
-MIT — free for personal and commercial use.
+MIT — free for personal use.
 Give credit if you fork something substantial.
-
----
 
 ## Credits
 
 Built by Dario Hunt
 Brand: LIVING LIFE FEARLESS
 App: Infinite Meme Machine 3000
-
----
