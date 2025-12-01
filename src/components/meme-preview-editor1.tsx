@@ -129,8 +129,8 @@ export default function MemePreviewEditor1({
 
   return (
     <>
-      <div className="space-y-4 md:flex md:gap-8 md:space-y-0 md:items-center md:justify-center">
-        <div>
+      <div className="w-full space-y-4 flex flex-col items-center lg:flex-row lg:gap-8 lg:space-y-0 md:justify-center">
+        <div className="w-full max-w-[700px]">
           <MemeCanvas
             imageUrl={imageSrc}
             caption={initialText}
@@ -157,7 +157,7 @@ export default function MemePreviewEditor1({
           onReadyToDownload={handleReadyToDownload}
         />
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mt-5 lg:mt-0">
           <label className="flex items-center gap-2 text-sm">
             <span className="uppercase text-sm tracking-wide text-neutral-400">
               Font Size
@@ -262,7 +262,7 @@ export default function MemePreviewEditor1({
           <span className="absolute inset-0 rounded-xl bg-linear-to-l from-rose-900 via-rose-700 to-rose-900"></span>
 
           {/* front */}
-          <span className="relative block px-9 py-5 rounded-xl text-white font-bold bg-[hsl(345,100%,46%)] transform -translate-y-1 transition-transform duration-600 ease-[cubic-bezier(.3,.7,.4,1)] group-hover:-translate-y-1.5 group-active:-translate-y-0.5">
+          <span className="relative block px-9 py-5 rounded-xl text-white font-bold text-md md:text-lg bg-[hsl(345,100%,46%)] transform -translate-y-1 transition-transform duration-600 ease-[cubic-bezier(.3,.7,.4,1)] group-hover:-translate-y-1.5 group-active:-translate-y-0.5">
             Generate Meme
           </span>
         </button>

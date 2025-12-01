@@ -82,7 +82,7 @@ export default function CaptionControls({
           <span className="absolute inset-0 rounded-xl bg-linear-to-l from-rose-900 via-rose-700 to-rose-900"></span>
 
           {/* front */}
-          <span className="relative block px-9 py-5 rounded-xl text-white font-bold bg-[hsl(345,100%,46%)] transform -translate-y-1 transition-transform duration-600 ease-[cubic-bezier(.3,.7,.4,1)] group-hover:-translate-y-1.5 group-active:-translate-y-0.5">
+          <span className="relative block px-9 py-5 rounded-xl text-white font-bold text-md md:text-lg bg-[hsl(345,100%,46%)] transform -translate-y-1 transition-transform duration-600 ease-[cubic-bezier(.3,.7,.4,1)] group-hover:-translate-y-1.5 group-active:-translate-y-0.5">
             {isLoading ? (
               <span className="inline-flex items-center gap-2">
                 <svg
@@ -170,7 +170,7 @@ export default function CaptionControls({
                 <input
                   type="radio"
                   name="captionChoice"
-                  className="mt-0.5 mr-2 peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-slate-300 hover:border-neutral-400 checked:border-neutral-400 checked:bg-black checked:bg-clip-content checked:p-0.5 transition-all ease-in-out duration-300 [&:not(:checked):hover]:bg-slate-100"
+                  className="mt-0.5 mr-2 peer h-4 w-4 shrink-0 cursor-pointer appearance-none rounded-full border border-slate-300 hover:border-neutral-400 checked:border-neutral-400 checked:bg-black checked:bg-clip-content checked:p-0.5 transition-all ease-in-out duration-300 [&:not(:checked):hover]:bg-slate-100"
                   checked={isSelected}
                   onChange={() => onSelectCaption(index)}
                   disabled={isLoading}

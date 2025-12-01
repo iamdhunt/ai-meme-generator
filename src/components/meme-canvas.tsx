@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import type { TextEffect, CaptionPosition } from "./meme-preview-editor1";
 import { getContainSize, drawCaption, drawWatermark } from "@/lib/meme-render";
 
@@ -30,7 +30,9 @@ export default function MemeCanvas({
   onCaptionPositionChange,
   fontScale,
 }: MemeCanvasProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [canvasSize, setCanvasSize] = useState({ width, height });
 
   const isDraggingRef = useRef(false);
   const dragOffsetRef = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
@@ -44,6 +46,28 @@ export default function MemeCanvas({
     drawHeight: number;
   } | null>(null);
 
+  /* ---------- responsive sizing ---------- */
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateSize = () => {
+      const containerWidth = container.offsetWidth;
+      const aspectRatio = height / width;
+      const newWidth = containerWidth;
+      const newHeight = containerWidth * aspectRatio;
+      setCanvasSize({ width: newWidth, height: newHeight });
+    };
+
+    updateSize();
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, [width, height]);
+
   /* ---------- core render function (no image loading here) ---------- */
 
   const renderCanvas = useCallback(async () => {
@@ -56,10 +80,11 @@ export default function MemeCanvas({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const { width: currentWidth, height: currentHeight } = canvasSize;
     const { offsetX, offsetY, drawWidth, drawHeight } = metrics;
 
     // clear full logical canvas area
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, currentWidth, currentHeight);
 
     // draw image in its contained area
     ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
@@ -91,7 +116,7 @@ export default function MemeCanvas({
         drawHeight
       );
     }
-  }, [caption, captionPosition, fontScale, textEffect, width, height]);
+  }, [caption, captionPosition, fontScale, textEffect, canvasSize]);
 
   /* ---------- mouse handlers (same behavior, but use metrics from ref) ---------- */
 
@@ -205,11 +230,13 @@ export default function MemeCanvas({
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
+      const { width: currentWidth, height: currentHeight } = canvasSize;
+
       const devicePixelRatio = window.devicePixelRatio || 1;
-      canvas.width = width * devicePixelRatio;
-      canvas.height = height * devicePixelRatio;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      canvas.width = currentWidth * devicePixelRatio;
+      canvas.height = currentHeight * devicePixelRatio;
+      canvas.style.width = `${currentWidth}px`;
+      canvas.style.height = `${currentHeight}px`;
 
       ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
 
@@ -227,7 +254,12 @@ export default function MemeCanvas({
 
       imageRef.current = img;
 
-      const metrics = getContainSize(img.width, img.height, width, height);
+      const metrics = getContainSize(
+        img.width,
+        img.height,
+        currentWidth,
+        currentHeight
+      );
       imageMetricsRef.current = metrics;
 
       // watermark (optional)
@@ -259,7 +291,7 @@ export default function MemeCanvas({
     return () => {
       cancelled = true;
     };
-  }, [imageUrl, width, height, watermarkSrc]);
+  }, [imageUrl, canvasSize, watermarkSrc, renderCanvas]);
 
   /* ---------- effect 2: redraw when text/effect/position/size change ---------- */
 
@@ -270,14 +302,19 @@ export default function MemeCanvas({
   }, [caption, captionPosition, textEffect, fontScale, renderCanvas]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="border border-neutral-700 bg-background"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-    />
+    <div
+      ref={containerRef}
+      className="w-full flex justify-center bg-background"
+    >
+      <canvas
+        ref={canvasRef}
+        className="border border-neutral-700 bg-background"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      />
+    </div>
   );
 }
 

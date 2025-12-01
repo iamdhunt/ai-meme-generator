@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import type { VibeCategories } from "@/types/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,7 +18,11 @@ export default function Vibes({
   selectedVibe,
   onSelectVibe,
 }: VibeSelectorProps) {
-  const [shuffledVibes] = useState(() => Shuffler(vibes));
+  const [shuffledVibes, setShuffledVibes] = useState(vibes);
+
+  useEffect(() => {
+    setShuffledVibes(Shuffler([...vibes]));
+  }, [vibes]);
 
   return (
     <>

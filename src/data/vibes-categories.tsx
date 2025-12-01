@@ -183,4 +183,18 @@ export const vibesCategories: VibeCategories[] = [
       "A vibe that reflects a discerning approach to music that makes one believe they have better taste than others, often emphasizing niche genres and underground artists.",
     tooltip: "A discerning taste in music.",
   },
+  {
+    id: "ongo-gablogian",
+    label: "Ongo Gablogian",
+    description:
+      "A vibe that channels the high-art troll himself, Ongo Gablogian from It's Always Sunny In Philadelphia, who thrives on confusion, discomfort, and aggressively abstract expression.",
+    tooltip: "Avant-garde chaos in human form.",
+  },
+  {
+    id: "carlcore",
+    label: "Carl",
+    description:
+      "A vibe embodying pure New Jersey chaos; full of petty complaints, delusional confidence, a short fuse, and questionable advice.",
+    tooltip: "Loud, greasy, aggressively wrong confidence.",
+  },
 ];

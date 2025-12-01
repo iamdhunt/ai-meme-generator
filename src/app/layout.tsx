@@ -5,7 +5,7 @@ import FontAwesomeConfig from "@/lib/fontawesome";
 import { APP_URL, APP_NAME, APP_DESCRIPTION } from "@/config/share-config";
 
 export const metadata: Metadata = {
-  title: `${APP_NAME} — Culture-Coded Chaos.`,
+  title: `${APP_NAME} ✱ Culture-Coded Chaos.`,
   description: APP_DESCRIPTION,
   metadataBase: new URL(APP_URL),
   keywords: [
@@ -26,10 +26,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: `${APP_URL}/og-image.png`,
+        url: `${APP_URL}/imm-image.png`,
         width: 1200,
         height: 630,
-        alt: `${APP_NAME} — Culture-Coded Chaos.`,
+        alt: `${APP_NAME} ✱ Culture-Coded Chaos.`,
       },
     ],
   },
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: APP_NAME,
     description: APP_DESCRIPTION,
-    images: [`${APP_URL}/og-image.png`],
+    images: [`${APP_URL}/imm-image.png`],
   },
   alternates: {
     canonical: APP_URL,
@@ -67,7 +67,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="max-w-[1200px] mx-auto">{children}</div>
+        <div className="max-w-[1440px] mx-auto">{children}</div>
       </body>
     </html>
   );

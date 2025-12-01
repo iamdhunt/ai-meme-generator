@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { ToneOptions } from "@/types/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,7 +18,11 @@ export default function Tones({
   selectedTone,
   onSelectTone,
 }: ToneSelectorProps) {
-  const [shuffledTones] = useState(() => Shuffler(tones));
+  const [shuffledTones, setShuffledTones] = useState(tones);
+
+  useEffect(() => {
+    setShuffledTones(Shuffler([...tones]));
+  }, [tones]);
 
   return (
     <>

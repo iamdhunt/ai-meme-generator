@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { memeTemplates } from "@/data/meme-template-imgs";
 import Shuffler from "@/utils/shuffler";
 
@@ -12,6 +15,12 @@ export default function MemeTemplates({
   selectedTemplateId,
   onSelectTemplate,
 }: MemeTemplatesProps) {
+  const [shuffledTemplates, setShuffledTemplates] = useState(memeTemplates);
+
+  useEffect(() => {
+    setShuffledTemplates(Shuffler([...memeTemplates]));
+  }, [memeTemplates]);
+
   return (
     <>
       <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -24,7 +33,7 @@ export default function MemeTemplates({
               type="button"
               onClick={() => onSelectTemplate(template.id)}
               className={[
-                "flex-none w-[150px] aspect-* overflow-hidden rounded-xl border-2 transition-all duration-300 hover:cursor-pointer",
+                "flex-none w-[75px] lg:w-[150px] aspect-* overflow-hidden rounded-xl border-2 transition-all duration-300 hover:cursor-pointer",
                 isSelected
                   ? "border-foreground ring-2 ring-foreground"
                   : "border-transparent hover:border-foreground",

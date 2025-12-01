@@ -17,10 +17,10 @@
 
 @layer components {
   .secondary-buttons {
-    @apply m-2 px-4 py-3 border-2 rounded uppercase text-sm font-bold hover:cursor-pointer hover:scale-110 transition-all ease-in-out duration-300;
+    @apply m-2 px-4 py-3 border-2 rounded uppercase text-xs md:text-sm font-bold hover:cursor-pointer hover:scale-110 transition-all ease-in-out duration-300;
   }
   .label {
-    @apply bg-gray-200 text-black text-sm font-semibold uppercase py-2 px-5 rounded-full hover:cursor-default;
+    @apply bg-gray-200 text-black text-xs md:text-sm font-semibold uppercase py-2 px-5 rounded-full hover:cursor-default;
   }
   .icon-hover {
     @apply hover:scale-120 transition-all ease-in-out duration-300;
