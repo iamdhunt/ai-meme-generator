@@ -84,7 +84,7 @@ export async function generateCaptions({
 
     IMPORTANT:
     - Treat this as a brand new request. Do NOT reference any previous captions or requests.
-    - Do not ask for clarification or additional information.
+    - Do not ask for images, clarification, or additional information.
     - Do not provide conversational filler.
     - Randomness seed: ${Date.now()}
 
