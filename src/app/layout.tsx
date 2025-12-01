@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: `${APP_URL}/imm-image.png`,
-        width: 1200,
-        height: 630,
+        width: 1024,
+        height: 1024,
         alt: `${APP_NAME} ✱ Culture-Coded Chaos.`,
       },
     ],
