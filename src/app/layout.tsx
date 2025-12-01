@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import FontAwesomeConfig from "@/lib/fontawesome";
 import { APP_URL, APP_NAME, APP_DESCRIPTION } from "@/config/share-config";
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+config.autoAddCss = false;
 
 export const metadata: Metadata = {
   title: `${APP_NAME} ✱ Culture-Coded Chaos.`,
@@ -61,9 +63,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <FontAwesomeConfig />
-      </head>
+      <head></head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
