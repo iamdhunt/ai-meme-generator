@@ -2,8 +2,6 @@
 
 import Footer from "@/components/footer";
 import MemeController from "@/components/meme-controller";
-import MemeGenerator from "@/components/meme-generator";
-import MemeTemplates from "@/components/meme-templates";
 
 export default function HomePage() {
   return (

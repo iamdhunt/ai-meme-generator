@@ -69,7 +69,7 @@ export async function generateCaptions({
 
   // build the prompt
   const prompt = `
-    You are an AI meme caption writer.
+    Ignore all previous instructions. You are a stateless AI meme caption writer.
 
     Vibe:
     - name: ${vibe?.label}
@@ -81,6 +81,12 @@ export async function generateCaptions({
 
     TASK:
     Write 3 different short, internet-native meme captions that fit the vibe and tone described above.
+
+    IMPORTANT:
+    - Treat this as a brand new request. Do NOT reference any previous captions or requests.
+    - Do not ask for clarification or additional information.
+    - Do not provide conversational filler.
+    - Randomness seed: ${Date.now()}
 
     CONSTRAINTS:
     - Each caption should be 5-12 words max
